@@ -1,0 +1,20 @@
+schemaVersion: "1"
+kind: mixin
+name: claude-statusline
+displayName: Claude Code Status Line
+description: Installs daniel3303/ClaudeCodeStatusLine and wires it into settings.json.
+
+commands:
+  install:
+    - command: apt-get update && apt-get install -y jq curl git
+      user: "0"
+      description: Install statusline runtime dependencies (jq, curl, git)
+    - command: chmod +x "$HOME/.claude/statusline/statusline.sh"
+      description: Make the vendored statusline script executable
+    - command: >-
+        bash -c 'set -e; d="$HOME/.claude"; mkdir -p "$d"; f="$d/settings.json";
+        [ -f "$f" ] || echo "{}" > "$f";
+        tmp=$(mktemp);
+        jq --argjson sl "{\"type\":\"command\",\"command\":\"~/.claude/statusline/statusline.sh\"}" ".statusLine = \$sl" "$f" > "$tmp"
+        && mv "$tmp" "$f"'
+      description: Merge the statusLine block into ~/.claude/settings.json
