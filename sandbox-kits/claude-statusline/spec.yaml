@@ -6,9 +6,6 @@ description: Installs daniel3303/ClaudeCodeStatusLine and wires it into settings
 
 commands:
   install:
-    - command: apt-get update && apt-get install -y jq curl git
-      user: "0"
-      description: Install statusline runtime dependencies (jq, curl, git)
     - command: chmod +x "$HOME/.claude/statusline/statusline.sh"
       description: Make the vendored statusline script executable
     - command: >-

@@ -9,10 +9,12 @@ into every `sbx run claude` sandbox and wires it into `~/.claude/settings.json`.
 At sandbox creation the kit:
 
 1. Drops the vendored `statusline.sh` at `~/.claude/statusline/statusline.sh`.
-2. Installs `jq`, `curl`, `git`.
-3. `chmod +x` the script.
-4. Merges `{ "statusLine": { "type": "command", "command": "~/.claude/statusline/statusline.sh" } }`
+2. `chmod +x` the script.
+3. Merges `{ "statusLine": { "type": "command", "command": "~/.claude/statusline/statusline.sh" } }`
    into `~/.claude/settings.json` (existing keys preserved).
+
+The statusline's runtime dependencies (`jq`, `curl`, `git`) ship in the default
+`claude` sandbox image, so the kit does not install them.
 
 ## Apply it once
 
