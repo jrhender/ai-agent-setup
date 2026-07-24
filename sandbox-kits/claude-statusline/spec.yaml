@@ -4,14 +4,33 @@ name: claude-statusline
 displayName: Claude Code Status Line
 description: Installs daniel3303/ClaudeCodeStatusLine and wires it into settings.json.
 
+# Delivery model (Docker Sandboxes kits are experimental; ordering below is observed,
+# not contractual):
+#   * Static files/ are copied at sandbox CREATION, AFTER install commands run.
+#     So an install command CANNOT chmod/read a files/-injected file — it isn't there
+#     yet, and a failing install command aborts creation with an opaque
+#     "500 ... failed to run sandbox container".
+#   * The base claude image already ships ~/.claude/settings.json with keys we must
+#     keep (defaultMode: bypassPermissions, etc.). That file DOES exist at install
+#     time, so we jq-merge statusLine into it instead of shipping our own (which would
+#     clobber those keys).
+#   * The script is delivered via files/ and invoked with `bash`, so no executable bit
+#     is needed. Verify it actually landed with `sbx exec` (static-file injection has
+#     known bugs) — see README.
+
 commands:
   install:
-    - command: chmod +x "$HOME/.claude/statusline/statusline.sh"
-      description: Make the vendored statusline script executable
-    - command: >-
-        bash -c 'set -e; d="$HOME/.claude"; mkdir -p "$d"; f="$d/settings.json";
-        [ -f "$f" ] || echo "{}" > "$f";
-        tmp=$(mktemp);
-        jq --argjson sl "{\"type\":\"command\",\"command\":\"~/.claude/statusline/statusline.sh\"}" ".statusLine = \$sl" "$f" > "$tmp"
-        && mv "$tmp" "$f"'
-      description: Merge the statusLine block into ~/.claude/settings.json
+    - command: |
+        set -e
+        f=/home/agent/.claude/settings.json
+        [ -f "$f" ] || echo '{}' > "$f"
+        tmp=$(mktemp)
+        jq '.statusLine={"type":"command","command":"bash ~/.claude/statusline/statusline.sh"}' "$f" > "$tmp"
+        # Write in place: install commands run as root, so `mv` would replace the file
+        # with a root:root 0600 temp file that the `agent` user (who Claude runs as)
+        # can no longer read. `cat >` keeps the existing file's owner/mode.
+        [ -s "$tmp" ] && cat "$tmp" > "$f"
+        rm -f "$tmp"
+        chown agent:agent "$f" 2>/dev/null || true
+        chmod 0644 "$f" 2>/dev/null || true
+      description: Merge statusLine into the agent's existing settings.json (preserving owner/mode)
