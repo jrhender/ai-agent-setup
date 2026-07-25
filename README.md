@@ -11,6 +11,7 @@ A repo for documenting and tracking AI agent setup.
 
 ### Skills
 - [Superpowers](https://github.com/obra/superpowers/)
+- [Document Review](https://mcpmarket.com/tools/skills/document-review) (by EveryInc)
 
 ### Status Line
 - [ClaudeCodeStatusLine](https://github.com/daniel3303/ClaudeCodeStatusLine)
