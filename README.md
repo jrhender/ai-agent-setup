@@ -16,3 +16,7 @@ A repo for documenting and tracking AI agent setup.
 ### Status Line
 - [ClaudeCodeStatusLine](https://github.com/daniel3303/ClaudeCodeStatusLine)
 - [`sandbox-kits/claude-statusline`](sandbox-kits/claude-statusline/) — a Docker Sandboxes mixin kit that installs ClaudeCodeStatusLine into every `sbx run claude` sandbox
+
+### Multiple account
+
+https://github.com/realiti4/claude-swap 
